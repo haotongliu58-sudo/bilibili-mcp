@@ -42,3 +42,25 @@ def test_format_video_info():
     assert "播放：1000" in out
     assert "这是简介" in out
     assert "BV1xx411c7mD" in out
+
+
+from bilibili_mcp.format import _format_subtitle
+
+
+def test_format_subtitle_plain():
+    items = [
+        {"from": 0.0, "to": 2.0, "content": "你好"},
+        {"from": 2.0, "to": 4.0, "content": "世界"},
+    ]
+    assert _format_subtitle(items, with_timestamp=False) == "你好 世界"
+
+
+def test_format_subtitle_with_timestamp():
+    items = [{"from": 65.0, "to": 67.0, "content": "开始"}]
+    out = _format_subtitle(items, with_timestamp=True)
+    assert "[1:05] 开始" in out
+
+
+def test_format_subtitle_empty_returns_friendly_message():
+    out = _format_subtitle([], with_timestamp=False)
+    assert "无字幕" in out

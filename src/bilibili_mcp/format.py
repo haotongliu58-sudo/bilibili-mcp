@@ -41,3 +41,14 @@ def _format_video_info(raw: dict) -> str:
         f"简介：{desc}",
         f"BV号：{raw.get('bvid', '')}",
     ])
+
+
+def _format_subtitle(items: list, with_timestamp: bool = False) -> str:
+    if not items:
+        return "该视频无字幕（UP主未上传，且无 AI 字幕）。"
+    if with_timestamp:
+        return "\n".join(
+            f"[{_fmt_duration(it.get('from', 0))}] {it.get('content', '')}"
+            for it in items
+        )
+    return " ".join(it.get("content", "") for it in items)
