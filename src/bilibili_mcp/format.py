@@ -52,3 +52,24 @@ def _format_subtitle(items: list, with_timestamp: bool = False) -> str:
             for it in items
         )
     return " ".join(it.get("content", "") for it in items)
+
+
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _strip_tags(s: str) -> str:
+    return _TAG_RE.sub("", s or "")
+
+
+def _format_search(raw: dict, limit: int = 10) -> str:
+    results = (raw or {}).get("result") or []
+    if not results:
+        return "没有搜到相关视频。"
+    lines = []
+    for i, r in enumerate(results[:limit], 1):
+        lines.append(
+            f"{i}. {_strip_tags(r.get('title', ''))}\n"
+            f"   UP主：{r.get('author', '')}  播放：{r.get('play', '')}  "
+            f"时长：{r.get('duration', '')}  BV号：{r.get('bvid', '')}"
+        )
+    return "\n".join(lines)

@@ -64,3 +64,36 @@ def test_format_subtitle_with_timestamp():
 def test_format_subtitle_empty_returns_friendly_message():
     out = _format_subtitle([], with_timestamp=False)
     assert "无字幕" in out
+
+
+from bilibili_mcp.format import _format_search
+
+
+def test_format_search_strips_highlight_tags():
+    raw = {
+        "result": [
+            {
+                "bvid": "BV1aa",
+                "title": '关于<em class="keyword">Python</em>的教程',
+                "author": "老师",
+                "play": 5000,
+                "duration": "10:00",
+            }
+        ]
+    }
+    out = _format_search(raw, limit=10)
+    assert "关于Python的教程" in out
+    assert "<em" not in out
+    assert "BV1aa" in out
+
+
+def test_format_search_respects_limit():
+    raw = {"result": [{"bvid": f"BV{i}", "title": str(i), "author": "a",
+                       "play": 0, "duration": "0:10"} for i in range(20)]}
+    out = _format_search(raw, limit=3)
+    # one "BV号：" label per entry → counts entries unambiguously
+    assert out.count("BV号：") == 3
+
+
+def test_format_search_empty():
+    assert "没有搜到" in _format_search({"result": []}, limit=10)
