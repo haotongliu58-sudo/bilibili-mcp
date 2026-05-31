@@ -97,3 +97,17 @@ def test_format_search_respects_limit():
 
 def test_format_search_empty():
     assert "没有搜到" in _format_search({"result": []}, limit=10)
+
+
+from bilibili_mcp.format import _friendly_error
+
+
+def test_friendly_error_detects_risk_control():
+    out = _friendly_error(Exception("response code: -412 请求被拦截"))
+    assert "限流" in out
+
+
+def test_friendly_error_passes_through_other():
+    out = _friendly_error(ValueError("boom"))
+    assert "ValueError" in out
+    assert "boom" in out

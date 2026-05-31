@@ -73,3 +73,13 @@ def _format_search(raw: dict, limit: int = 10) -> str:
             f"时长：{r.get('duration', '')}  BV号：{r.get('bvid', '')}"
         )
     return "\n".join(lines)
+
+
+_RISK_MARKERS = ("-412", "-799", "-352", "风控", "请求被拦截")
+
+
+def _friendly_error(exc: Exception) -> str:
+    msg = str(exc)
+    if any(m in msg for m in _RISK_MARKERS):
+        return "被 B站临时限流了（风控），请过一会儿再试，或降低请求频率。"
+    return f"调用 B站接口失败：{type(exc).__name__}: {msg}"
