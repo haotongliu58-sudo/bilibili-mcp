@@ -14,3 +14,31 @@ def test_extract_bvid_from_full_url():
 def test_extract_bvid_raises_when_absent():
     with pytest.raises(ValueError):
         extract_bvid("https://www.bilibili.com/video/")
+
+
+from bilibili_mcp.format import _fmt_duration, _format_video_info
+
+
+def test_fmt_duration():
+    assert _fmt_duration(65) == "1:05"
+    assert _fmt_duration(3725) == "1:02:05"
+
+
+def test_format_video_info():
+    raw = {
+        "bvid": "BV1xx411c7mD",
+        "title": "测试视频",
+        "owner": {"name": "某UP主"},
+        "tname": "科技",
+        "duration": 125,
+        "pubdate": 1700000000,
+        "stat": {"view": 1000, "like": 200, "coin": 50},
+        "desc": "  这是简介  ",
+    }
+    out = _format_video_info(raw)
+    assert "标题：测试视频" in out
+    assert "UP主：某UP主" in out
+    assert "时长：2:05" in out
+    assert "播放：1000" in out
+    assert "这是简介" in out
+    assert "BV1xx411c7mD" in out
