@@ -6,11 +6,17 @@ Clash system proxy (an overseas node) breaks or slows requests. So by default
 we strip proxy env vars AND tell the underlying client to ignore the system
 proxy (env vars + Windows registry, both controlled by httpx trust_env). Set
 BILI_USE_PROXY=1 to opt back in (useful for overseas users).
+
+Auth policy: video info and search work as a guest (no login). Subtitles are
+gated behind login by Bilibili, so they require the user's own SESSDATA cookie,
+supplied via the BILI_SESSDATA env var. Without it, the subtitle tool returns
+friendly guidance instead of failing. Optional companions: BILI_BILI_JCT,
+BILI_BUVID3, BILI_DEDEUSERID (rarely needed for read-only subtitle access).
 """
 import os
 
 import httpx
-from bilibili_api import video, search, request_settings
+from bilibili_api import video, search, request_settings, Credential
 
 _USE_PROXY = os.environ.get("BILI_USE_PROXY", "") not in ("", "0", "false", "False")
 
@@ -46,12 +52,31 @@ def _configure_proxy() -> None:
 _configure_proxy()
 
 
+def _load_credential():
+    """Build a Credential from env vars, or return None if no SESSDATA set."""
+    sessdata = os.environ.get("BILI_SESSDATA", "").strip()
+    if not sessdata:
+        return None
+    return Credential(
+        sessdata=sessdata,
+        bili_jct=os.environ.get("BILI_BILI_JCT", "").strip() or None,
+        buvid3=os.environ.get("BILI_BUVID3", "").strip() or None,
+        dedeuserid=os.environ.get("BILI_DEDEUSERID", "").strip() or None,
+    )
+
+
+def has_credential() -> bool:
+    """True if a SESSDATA cookie is configured (subtitles available)."""
+    return bool(os.environ.get("BILI_SESSDATA", "").strip())
+
+
 async def fetch_video_info(bvid: str) -> dict:
     return await video.Video(bvid=bvid).get_info()
 
 
 async def fetch_subtitle(bvid: str, lang: str = "zh-CN") -> list:
-    v = video.Video(bvid=bvid)
+    """Fetch subtitle lines. Requires a configured credential (SESSDATA)."""
+    v = video.Video(bvid=bvid, credential=_load_credential())
     cid = await v.get_cid(0)
     data = await v.get_subtitle(cid)
     subs = data.get("subtitles", []) if isinstance(data, dict) else []

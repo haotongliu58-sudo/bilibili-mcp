@@ -111,3 +111,12 @@ def test_friendly_error_passes_through_other():
     out = _friendly_error(ValueError("boom"))
     assert "ValueError" in out
     assert "boom" in out
+
+
+from bilibili_mcp.format import no_credential_message
+
+
+def test_no_credential_message_mentions_sessdata():
+    out = no_credential_message()
+    assert "SESSDATA" in out
+    assert "BILI_SESSDATA" in out

@@ -15,6 +15,7 @@ from .format import (
     _format_subtitle,
     _format_search,
     _friendly_error,
+    no_credential_message,
 )
 
 mcp = FastMCP("bilibili-mcp")
@@ -45,14 +46,18 @@ async def get_video_subtitle(
 ) -> str:
     """Get the full subtitle/transcript text of a Bilibili video.
 
-    Useful for asking the AI to summarize a video. Returns a clear message
-    when the video has no subtitles.
+    Useful for asking the AI to summarize a video. Bilibili gates subtitles
+    behind login, so this needs a SESSDATA cookie in the BILI_SESSDATA env var
+    (see README); without it, guidance is returned. Returns a clear message
+    when the video simply has no subtitles.
 
     Args:
         bvid: A BV id or full video URL.
         lang: Subtitle language code. Default "zh-CN".
         with_timestamp: Prefix each line with its timestamp. Default False.
     """
+    if not bili.has_credential():
+        return no_credential_message()
     try:
         items = await bili.fetch_subtitle(extract_bvid(bvid), lang)
         return _format_subtitle(items, with_timestamp)

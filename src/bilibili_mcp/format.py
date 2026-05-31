@@ -83,3 +83,17 @@ def _friendly_error(exc: Exception) -> str:
     if any(m in msg for m in _RISK_MARKERS):
         return "被 B站临时限流了（风控），请过一会儿再试，或降低请求频率。"
     return f"调用 B站接口失败：{type(exc).__name__}: {msg}"
+
+
+def no_credential_message() -> str:
+    """Guidance shown when a login-gated tool runs without a configured cookie.
+
+    Bilibili gates subtitle data behind login, so this tool needs the user's
+    own SESSDATA. Video info and search still work as a guest.
+    """
+    return (
+        "获取字幕需要登录态：B站已把字幕接口限制为登录用户。\n"
+        "请在环境变量 BILI_SESSDATA 中填入你自己 B站账号的 SESSDATA cookie 后重试"
+        "（仅在你本机使用、不会上传）。\n"
+        "视频信息（get_video_info）和搜索（search_videos）无需登录，可直接使用。"
+    )
