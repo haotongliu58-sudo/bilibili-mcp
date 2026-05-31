@@ -1,8 +1,19 @@
 # bilibili-mcp 设计文档
 
 - 日期：2026-05-30
-- 状态：设计已确认，待出实现计划
+- 状态：已实现（v1，2026-05-31）。见下方「实现修订」
 - 所属：MCP 路线图 M3（跳过 M2，详见决策记录）
+
+## 实现修订（2026-05-31，实测后用户拍板）
+
+实现 + 端到端实测发现：**B站已把字幕 / AI总结接口限制为登录用户**（游客调 `player/wbi/v2` 拿到的 `subtitle.subtitles` 恒为空；`get_ai_conclusion` 直接返回 `-101 账号未登录`）。这与原设计「不碰 SESSDATA、纯游客」硬冲突，而字幕正是杀手锏。
+
+**用户决定：加可选 SESSDATA（默认仍游客）。**
+- `get_video_info` / `search_videos`：纯游客，无需登录（实测直连秒回，代理绕过成功）。
+- `get_video_subtitle`：需要用户自己的 `BILI_SESSDATA` cookie（环境变量，仅本机用、不上传）。未配置时返回友好提示，不报错。
+- 实现：`bili._load_credential()` 从 `BILI_SESSDATA`(+可选 `BILI_BILI_JCT`/`BILI_BUVID3`/`BILI_DEDEUSERID`) 构建 Credential；`server.get_video_subtitle` 先查 `bili.has_credential()`。
+- 风险心智：本地工具 + 用户自己 cookie + 自己机器 → 风险归用户自身，与「本地跑零风险」一致。
+- ⚠️ 待验证：带真实 SESSDATA 的字幕抽取链路尚未端到端实跑（无 cookie），代码按库 verify 通过路径写好，待用户提供 cookie 后补验。
 
 ## 背景与目标
 
