@@ -171,3 +171,33 @@ def test_format_hotwords_renders_words_and_segments():
 
 def test_format_hotwords_empty_returns_friendly_message():
     assert "无弹幕" in _format_hotwords([], [], total=0)
+
+
+from bilibili_mcp.format import _format_comments
+
+
+def test_format_comments_renders_user_likes_content():
+    replies = [
+        {"member": {"uname": "张三"}, "like": 100, "content": {"message": "好视频"}},
+        {"member": {"uname": "李四"}, "like": 5, "content": {"message": "学到了"}},
+    ]
+    out = _format_comments(replies, limit=20, sort="hot")
+    assert "张三" in out
+    assert "100" in out
+    assert "好视频" in out
+    assert "李四" in out
+    assert "热评" in out  # header notes the sort
+
+
+def test_format_comments_respects_limit_label():
+    replies = [
+        {"member": {"uname": f"u{i}"}, "like": i, "content": {"message": str(i)}}
+        for i in range(20)
+    ]
+    out = _format_comments(replies[:3], limit=3, sort="time")
+    assert out.count("👤") == 3  # one marker per comment
+    assert "最新" in out
+
+
+def test_format_comments_empty():
+    assert "暂无评论" in _format_comments([], limit=20, sort="hot")
