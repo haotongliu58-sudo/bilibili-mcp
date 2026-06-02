@@ -17,6 +17,7 @@ from .format import (
     _format_search,
     _format_danmaku,
     _format_hotwords,
+    _format_comments,
     _friendly_error,
     no_credential_message,
 )
@@ -130,6 +131,28 @@ async def get_danmaku_hotwords(
         hot = analyze.count_hotwords(items, top)
         segs = analyze.high_energy_segments(items, segments)
         return _format_hotwords(hot, segs, total=len(items))
+    except ValueError as e:
+        return str(e)
+    except Exception as e:  # noqa: BLE001
+        return _friendly_error(e)
+
+
+@mcp.tool()
+async def get_video_comments(
+    bvid: str, sort: str = "hot", limit: int = 20
+) -> str:
+    """Get a Bilibili video's top-level comments. Guest, no login.
+
+    Great for summarizing audience reception or finding points of debate.
+
+    Args:
+        bvid: A BV id or full video URL.
+        sort: "hot" (by likes, default) or "time" (newest).
+        limit: Max comments to return. Default 20.
+    """
+    try:
+        replies = await bili.fetch_comments(extract_bvid(bvid), sort, limit)
+        return _format_comments(replies, limit, sort)
     except ValueError as e:
         return str(e)
     except Exception as e:  # noqa: BLE001
