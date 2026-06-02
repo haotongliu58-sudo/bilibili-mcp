@@ -1,5 +1,5 @@
 [project]
-name = "bilibili-mcp"
+name = "bilibili-data-mcp"
 version = "0.2.0"
 description = "An MCP server that lets any AI client read public Bilibili data: video info, subtitles, danmaku, danmaku hotwords, comments, and search."
 readme = "README.md"
@@ -22,7 +22,7 @@ dependencies = [
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-bilibili-mcp = "bilibili_mcp.server:main"
+bilibili-data-mcp = "bilibili_mcp.server:main"
 
 [project.urls]
 Homepage = "https://github.com/haotongliu58-sudo/bilibili-mcp"

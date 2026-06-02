@@ -17,6 +17,31 @@ An MCP server that lets any AI client (Claude, Cursor, ...) read **public** Bili
 
 ## Install
 
+The PyPI package is **`bilibili-data-mcp`** (the import module is `bilibili_mcp`).
+
+### Option A — uvx (recommended, no clone, no manual venv)
+
+If you have [uv](https://docs.astral.sh/uv/), just point your MCP client at the
+package — `uvx` downloads it from PyPI, builds an isolated environment, and runs
+it automatically:
+
+```json
+{
+  "mcpServers": {
+    "bilibili": {
+      "command": "uvx",
+      "args": ["bilibili-data-mcp"]
+    }
+  }
+}
+```
+
+To pin a version, use `"args": ["bilibili-data-mcp@0.2.0"]`. The same config
+works for any MCP client (Claude Desktop, Cursor, ...) via its
+`claude_desktop_config.json` / equivalent.
+
+### Option B — from source (development)
+
 ```
 git clone https://github.com/haotongliu58-sudo/bilibili-mcp
 cd bilibili-mcp
@@ -24,39 +49,13 @@ python -m venv .venv
 .venv\Scripts\python.exe -m pip install -e .
 ```
 
-### Run without cloning (uvx)
-
-If you have [uv](https://docs.astral.sh/uv/), you can run the server directly
-from GitHub — no clone, no manual venv:
-
-```
-uvx --from git+https://github.com/haotongliu58-sudo/bilibili-mcp bilibili-mcp
-```
-
-MCP client config using uvx:
+Then point your MCP client at the built executable:
 
 ```json
 {
   "mcpServers": {
     "bilibili": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/haotongliu58-sudo/bilibili-mcp", "bilibili-mcp"]
-    }
-  }
-}
-```
-
-The clone + `pip install -e .` path above is still recommended for development.
-
-## Configure your MCP client
-
-Add to your client's MCP config (e.g. Claude Desktop `claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "bilibili": {
-      "command": "C:\\path\\to\\bilibili-mcp\\.venv\\Scripts\\bilibili-mcp.exe"
+      "command": "C:\\path\\to\\bilibili-mcp\\.venv\\Scripts\\bilibili-data-mcp.exe"
     }
   }
 }
@@ -72,7 +71,8 @@ To enable subtitles, get the `SESSDATA` value from your browser cookies on `bili
 {
   "mcpServers": {
     "bilibili": {
-      "command": "C:\\path\\to\\bilibili-mcp\\.venv\\Scripts\\bilibili-mcp.exe",
+      "command": "uvx",
+      "args": ["bilibili-data-mcp"],
       "env": { "BILI_SESSDATA": "your_sessdata_value_here" }
     }
   }
