@@ -54,6 +54,21 @@ def _format_subtitle(items: list, with_timestamp: bool = False) -> str:
     return " ".join(it.get("content", "") for it in items)
 
 
+def _format_danmaku(items: list, limit: int = 200, with_timestamp: bool = False) -> str:
+    if not items:
+        return "该视频无弹幕。"
+    ordered = sorted(items, key=lambda it: it.get("time", 0))
+    header = f"共 {len(items)} 条弹幕（按出现时间，最多展示 {min(limit, len(items))} 条）："
+    lines = []
+    for it in ordered[:limit]:
+        text = it.get("text", "")
+        if with_timestamp:
+            lines.append(f"[{_fmt_duration(it.get('time', 0))}] {text}")
+        else:
+            lines.append(text)
+    return header + "\n" + "\n".join(lines)
+
+
 _TAG_RE = re.compile(r"<[^>]+>")
 
 

@@ -1,6 +1,6 @@
 # bilibili-mcp
 
-An MCP server that lets any AI client (Claude, Cursor, ...) read **public** Bilibili data: video info, subtitles, and search. It's a thin wrapper over the mature [`bilibili-api`](https://github.com/Nemo2011/bilibili-api) library — all WBI signing, cookies, and anti-abuse handling are delegated to it.
+An MCP server that lets any AI client (Claude, Cursor, ...) read **public** Bilibili data: video info, subtitles, danmaku, and search. It's a thin wrapper over the mature [`bilibili-api`](https://github.com/Nemo2011/bilibili-api) library — all WBI signing, cookies, and anti-abuse handling are delegated to it.
 
 > Reads public data only. Video info and search work as a guest (no login). Subtitles are gated behind login by Bilibili itself, so the subtitle tool needs your own SESSDATA cookie (see below). For personal/research use at a reasonable request rate.
 
@@ -10,6 +10,7 @@ An MCP server that lets any AI client (Claude, Cursor, ...) read **public** Bili
 | --- | --- |
 | `get_video_info(bvid)` | Title, uploader, play/like/coin counts, duration, publish date, description. Accepts a BV id or a full video URL. **Guest, no login.** |
 | `get_video_subtitle(bvid, lang="zh-CN", with_timestamp=False)` | Full subtitle/transcript text — great for "summarize this video". **Requires login** (`BILI_SESSDATA`, see below); returns clear guidance if no cookie is set, and a clear message when a video simply has no subtitles. |
+| `get_video_danmaku(bvid, limit=200, with_timestamp=False)` | All danmaku (弹幕, on-screen bullet comments), ordered by appearance time — great for asking the AI what memes viewers spam, the overall mood, or which moments are "高能". **Guest, no login.** |
 | `search_videos(keyword, page=1, limit=10)` | Search videos by keyword. **Guest, no login.** |
 
 ## Install

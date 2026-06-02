@@ -14,6 +14,7 @@ from .format import (
     _format_video_info,
     _format_subtitle,
     _format_search,
+    _format_danmaku,
     _friendly_error,
     no_credential_message,
 )
@@ -79,6 +80,30 @@ async def search_videos(keyword: str, page: int = 1, limit: int = 10) -> str:
     try:
         raw = await bili.fetch_search(keyword, page)
         return _format_search(raw, limit)
+    except Exception as e:  # noqa: BLE001
+        return _friendly_error(e)
+
+
+@mcp.tool()
+async def get_video_danmaku(
+    bvid: str, limit: int = 200, with_timestamp: bool = False
+) -> str:
+    """Get a Bilibili video's danmaku (弹幕, on-screen bullet comments).
+
+    Unlike subtitles, danmaku are public and need no login. Great for asking
+    the AI what memes/jokes viewers are spamming, the overall mood, or which
+    moments are "高能". Comments are returned ordered by appearance time.
+
+    Args:
+        bvid: A BV id or full video URL.
+        limit: Max comments to return. Default 200.
+        with_timestamp: Prefix each line with its appearance time. Default False.
+    """
+    try:
+        items = await bili.fetch_danmaku(extract_bvid(bvid))
+        return _format_danmaku(items, limit, with_timestamp)
+    except ValueError as e:
+        return str(e)
     except Exception as e:  # noqa: BLE001
         return _friendly_error(e)
 

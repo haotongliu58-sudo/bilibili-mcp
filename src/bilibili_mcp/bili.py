@@ -93,6 +93,18 @@ async def fetch_subtitle(bvid: str, lang: str = "zh-CN") -> list:
     return r.json().get("body", [])
 
 
+async def fetch_danmaku(bvid: str) -> list:
+    """Fetch danmaku (bullet comments) as plain dicts. Works as a guest.
+
+    Unlike subtitles, danmaku are public and need no login. Returns a list of
+    {"text": str, "time": float} where time is the second the comment appears.
+    """
+    v = video.Video(bvid=bvid)
+    cid = await v.get_cid(0)
+    dms = await v.get_danmakus(0, cid=cid)
+    return [{"text": d.text, "time": float(d.dm_time)} for d in dms]
+
+
 async def fetch_search(keyword: str, page: int = 1) -> dict:
     return await search.search_by_type(
         keyword, search_type=search.SearchObjectType.VIDEO, page=page

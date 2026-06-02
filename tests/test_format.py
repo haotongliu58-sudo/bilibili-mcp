@@ -120,3 +120,36 @@ def test_no_credential_message_mentions_sessdata():
     out = no_credential_message()
     assert "SESSDATA" in out
     assert "BILI_SESSDATA" in out
+
+
+from bilibili_mcp.format import _format_danmaku
+
+
+def test_format_danmaku_plain_sorts_by_time_and_shows_count():
+    items = [
+        {"text": "草", "time": 12.0},
+        {"text": "前排", "time": 1.0},
+    ]
+    out = _format_danmaku(items)
+    assert "共 2 条弹幕" in out
+    # sorted by appearance time: 前排 (1s) before 草 (12s)
+    assert out.index("前排") < out.index("草")
+
+
+def test_format_danmaku_with_timestamp():
+    items = [{"text": "高能", "time": 65.0}]
+    out = _format_danmaku(items, with_timestamp=True)
+    assert "[1:05] 高能" in out
+
+
+def test_format_danmaku_respects_limit():
+    items = [{"text": str(i), "time": float(i)} for i in range(20)]
+    out = _format_danmaku(items, limit=5)
+    assert "共 20 条弹幕" in out
+    # only 5 lines rendered after the header
+    body = out.split("\n")[1:]
+    assert len([ln for ln in body if ln.strip()]) == 5
+
+
+def test_format_danmaku_empty_returns_friendly_message():
+    assert "无弹幕" in _format_danmaku([])
