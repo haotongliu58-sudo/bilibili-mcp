@@ -112,3 +112,22 @@ def no_credential_message() -> str:
         "（仅在你本机使用、不会上传）。\n"
         "视频信息（get_video_info）和搜索（search_videos）无需登录，可直接使用。"
     )
+
+
+def _format_hotwords(hotwords: list, segments: list, total: int) -> str:
+    """Render hotword ranking + high-energy segments.
+
+    hotwords: list of (text, count). segments: list of (start, end, count).
+    """
+    if total <= 0:
+        return "该视频无弹幕。"
+    lines = [f"共 {total} 条弹幕。", "", "🔥 高频弹幕："]
+    for i, (text, count) in enumerate(hotwords, 1):
+        lines.append(f"{i}. {text} ×{count}")
+    if segments:
+        lines += ["", "⚡ 高能时间段："]
+        for start, end, count in segments:
+            lines.append(
+                f"{_fmt_duration(int(start))}–{_fmt_duration(int(end))} · {count} 条"
+            )
+    return "\n".join(lines)

@@ -153,3 +153,21 @@ def test_format_danmaku_respects_limit():
 
 def test_format_danmaku_empty_returns_friendly_message():
     assert "无弹幕" in _format_danmaku([])
+
+
+from bilibili_mcp.format import _format_hotwords
+
+
+def test_format_hotwords_renders_words_and_segments():
+    hot = [("草", 3), ("awsl", 2)]
+    segs = [(0.0, 10.0, 3), (10.0, 20.0, 2)]
+    out = _format_hotwords(hot, segs, total=5)
+    assert "共 5 条弹幕" in out
+    assert "草 ×3" in out
+    assert "awsl ×2" in out
+    assert "0:00–0:10 · 3 条" in out
+    assert "0:10–0:20 · 2 条" in out
+
+
+def test_format_hotwords_empty_returns_friendly_message():
+    assert "无弹幕" in _format_hotwords([], [], total=0)
