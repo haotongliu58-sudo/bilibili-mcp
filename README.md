@@ -11,6 +11,8 @@ An MCP server that lets any AI client (Claude, Cursor, ...) read **public** Bili
 | `get_video_info(bvid)` | Title, uploader, play/like/coin counts, duration, publish date, description. Accepts a BV id or a full video URL. **Guest, no login.** |
 | `get_video_subtitle(bvid, lang="zh-CN", with_timestamp=False)` | Full subtitle/transcript text — great for "summarize this video". **Requires login** (`BILI_SESSDATA`, see below); returns clear guidance if no cookie is set, and a clear message when a video simply has no subtitles. |
 | `get_video_danmaku(bvid, limit=200, with_timestamp=False)` | All danmaku (弹幕, on-screen bullet comments), ordered by appearance time — great for asking the AI what memes viewers spam, the overall mood, or which moments are "高能". **Guest, no login.** |
+| `get_danmaku_hotwords(bvid, top=20, segments=5)` | Aggregates danmaku into a top repeated-comment ranking plus the highest-density "高能" time segments — a quick read on what viewers spam and which moments spike. **Guest, no login.** |
+| `get_video_comments(bvid, sort="hot", limit=20)` | Top-level video comments (username, likes, content), sorted by likes (`hot`) or newest (`time`) — great for summarizing reception or finding debate. **Guest, no login.** |
 | `search_videos(keyword, page=1, limit=10)` | Search videos by keyword. **Guest, no login.** |
 
 ## Install
@@ -21,6 +23,30 @@ cd bilibili-mcp
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -e .
 ```
+
+### Run without cloning (uvx)
+
+If you have [uv](https://docs.astral.sh/uv/), you can run the server directly
+from GitHub — no clone, no manual venv:
+
+```
+uvx --from git+https://github.com/haotongliu58-sudo/bilibili-mcp bilibili-mcp
+```
+
+MCP client config using uvx:
+
+```json
+{
+  "mcpServers": {
+    "bilibili": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/haotongliu58-sudo/bilibili-mcp", "bilibili-mcp"]
+    }
+  }
+}
+```
+
+The clone + `pip install -e .` path above is still recommended for development.
 
 ## Configure your MCP client
 
