@@ -16,7 +16,7 @@ BILI_BUVID3, BILI_DEDEUSERID (rarely needed for read-only subtitle access).
 import os
 
 import httpx
-from bilibili_api import video, search, request_settings, Credential
+from bilibili_api import video, search, comment, request_settings, Credential
 
 _USE_PROXY = os.environ.get("BILI_USE_PROXY", "") not in ("", "0", "false", "False")
 
@@ -109,3 +109,29 @@ async def fetch_search(keyword: str, page: int = 1) -> dict:
     return await search.search_by_type(
         keyword, search_type=search.SearchObjectType.VIDEO, page=page
     )
+
+
+async def fetch_comments(bvid: str, sort: str = "hot", limit: int = 20) -> list:
+    """Fetch top-level video comments as raw reply dicts. Works as a guest.
+
+    sort: "hot" (by likes) or "time" (newest). Pages until `limit` is reached.
+    """
+    if sort == "hot":
+        order = comment.OrderType.LIKE
+    elif sort == "time":
+        order = comment.OrderType.TIME
+    else:
+        raise ValueError(f"sort 只能是 'hot' 或 'time'，收到：{sort!r}")
+    aid = video.Video(bvid=bvid).get_aid()
+    out: list = []
+    page = 1
+    while len(out) < limit:
+        data = await comment.get_comments(
+            int(aid), comment.CommentResourceType.VIDEO, page, order
+        )
+        replies = (data or {}).get("replies") or []
+        if not replies:
+            break
+        out.extend(replies)
+        page += 1
+    return out[:limit]

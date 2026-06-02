@@ -112,3 +112,37 @@ def no_credential_message() -> str:
         "（仅在你本机使用、不会上传）。\n"
         "视频信息（get_video_info）和搜索（search_videos）无需登录，可直接使用。"
     )
+
+
+def _format_hotwords(hotwords: list, segments: list, total: int) -> str:
+    """Render hotword ranking + high-energy segments.
+
+    hotwords: list of (text, count). segments: list of (start, end, count).
+    """
+    if total <= 0:
+        return "该视频无弹幕。"
+    lines = [f"共 {total} 条弹幕。", "", "🔥 高频弹幕："]
+    for i, (text, count) in enumerate(hotwords, 1):
+        lines.append(f"{i}. {text} ×{count}")
+    if segments:
+        lines += ["", "⚡ 高能时间段："]
+        for start, end, count in segments:
+            lines.append(
+                f"{_fmt_duration(int(start))}–{_fmt_duration(int(end))} · {count} 条"
+            )
+    return "\n".join(lines)
+
+
+def _format_comments(replies: list, limit: int = 20, sort: str = "hot") -> str:
+    """Render top-level comments: username, likes, content."""
+    if not replies:
+        return "该视频暂无评论。"
+    sort_label = "热评" if sort == "hot" else "最新"
+    shown = replies[:limit]
+    lines = [f"共展示 {len(shown)} 条评论（{sort_label}）："]
+    for r in shown:
+        uname = (r.get("member") or {}).get("uname", "")
+        like = r.get("like", 0)
+        message = (r.get("content") or {}).get("message", "")
+        lines.append(f"👤 {uname}（👍{like}）：{message}")
+    return "\n".join(lines)
