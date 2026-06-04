@@ -2,6 +2,10 @@
 
 An MCP server that lets any AI client (Claude, Cursor, ...) read **public** Bilibili data: video info, subtitles, danmaku, and search. It's a thin wrapper over the mature [`bilibili-api`](https://github.com/Nemo2011/bilibili-api) library — all WBI signing, cookies, and anti-abuse handling are delegated to it.
 
+![bilibili-mcp demo](assets/demo.gif)
+
+> *Demo: from an AI client — search Bilibili, fetch video info, and analyze what viewers are spamming in the danmaku.*
+
 > Reads public data only. Video info and search work as a guest (no login). Subtitles are gated behind login by Bilibili itself, so the subtitle tool needs your own SESSDATA cookie (see below). For personal/research use at a reasonable request rate.
 
 ## Tools
