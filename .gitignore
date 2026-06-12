@@ -1,4 +1,7 @@
 .venv/
+.venv-apify/
+apify-actor/storage/
+apify-actor/apify_storage/
 __pycache__/
 *.pyc
 *.egg-info/

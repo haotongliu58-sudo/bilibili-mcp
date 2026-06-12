@@ -1,0 +1,7 @@
+{
+    "tool-call": {
+        "eventTitle": "Bilibili data tool call",
+        "eventDescription": "Flat fee charged for each successful Bilibili data tool call (video info, subtitle, search, danmaku, hotwords, comments).",
+        "eventPriceUsd": 0.02
+    }
+}

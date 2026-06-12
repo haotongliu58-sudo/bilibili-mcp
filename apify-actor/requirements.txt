@@ -1,0 +1,10 @@
+# Apify Actor + MCP runtime
+apify >= 3.0.0, < 4.0.0
+apify-client
+fastmcp >= 3.0.0, < 4.0.0
+mcp >= 1.25.0, < 2.0.0
+pyjwt >= 2.12.0  # Transitive dep of mcp; pin until mcp's floor clears < 2.12.0
+
+# The published Bilibili data logic (bili.py / analyze.py / format.py).
+# Single source of truth; this Actor only adds a thin charging + standby wrapper.
+bilibili-data-mcp == 0.2.0

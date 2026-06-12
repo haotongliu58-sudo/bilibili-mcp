@@ -1,0 +1,24 @@
+{
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "bilibili-data-mcp",
+    "title": "Bilibili Data MCP Server",
+    "description": "MCP server that lets any AI client read public Bilibili data: video info, subtitles, danmaku, danmaku hotwords, comments, and search.",
+    "version": "0.2",
+    "buildTag": "latest",
+    "usesStandbyMode": true,
+    "meta": {
+        "templateId": "python-mcp-empty",
+        "generatedBy": "claude-opus-4-8"
+    },
+    "input": {
+        "title": "Actor input schema",
+        "description": "This MCP server takes no run input; connect an MCP client to the standby /mcp endpoint.",
+        "type": "object",
+        "schemaVersion": 1,
+        "properties": {},
+        "required": []
+    },
+    "dockerfile": "../Dockerfile",
+    "webServerMcpPath": "/mcp"
+}
